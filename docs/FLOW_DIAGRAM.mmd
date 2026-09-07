@@ -1,0 +1,176 @@
+
+flowchart TD
+    Auth[Login / Register screen] --> Dash
+
+    subgraph NAV["Bottom tab bar - persistent"]
+        direction LR
+        TabHome[Home]
+        TabHistory[History]
+        TabExchange[Exchange]
+    end
+
+    %% =========================
+    %% DASHBOARD
+    %% =========================
+    TabHome --> Dash
+
+    Dash[Dashboard:
+    - Total balance in base currency
+    - Base currency
+    - Wallet cards
+    - Recent transactions
+    - View all transactions]
+
+    Dash --> DB[GET /dashboard]
+
+    DB --> DB1[Total Balance:
+    totalBalanceBase
+    baseCurrency]
+
+    DB --> DB2[Wallet Cards:
+    currencyCode
+    balance]
+
+    DB --> DB3[Recent Transactions:
+    up to 5 transactions
+    id
+    type
+    currencies
+    amounts
+    status
+    createdAt]
+
+    Dash -.->|tap a wallet card| CH[Currency history screen:
+    selected currency
+    balance
+    transaction history]
+
+    CH --> CW[GET /wallets/:currencyCode]
+    CW --> CH1[Wallet balance
+    transaction count
+    createdAt]
+
+    CH -.->|no transactions| CH2[Empty state:
+    No transactions yet]
+
+    CH -.->|tap a transaction row| TD[Transaction detail screen]
+
+    %% =========================
+    %% HISTORY
+    %% =========================
+    TabHistory --> H[All transactions screen:
+    every currency
+    unfiltered by default]
+
+    H --> HT[GET /transactions]
+
+    HT --> H1[Transaction list:
+    id
+    type
+    fromCurrency
+    toCurrency
+    sourceAmount
+    destinationAmount
+    status
+    createdAt]
+
+    H -.->|no transactions| H2[Empty state:
+    No transactions yet]
+
+    H -.->|tap a row| TD
+
+    TD --> TDD[GET /transactions/:id]
+
+    TDD --> TDF[Transaction detail:
+    id
+    type
+    currencies
+    sourceAmount
+    fee
+    rate
+    destinationAmount
+    status
+    createdAt]
+
+    %% =========================
+    %% EXCHANGE
+    %% =========================
+    TabExchange --> EC[All currencies screen:
+    available currencies]
+
+    EC --> ECS[GET /currencies]
+
+    ECS --> EC1[Currency list:
+    code
+    name
+    decimalPlaces]
+
+    EC --> ES[Tap currency
+    to trade from]
+
+    ES --> ET[Select target currency]
+
+    ET --> EA[Enter amount]
+
+    EA --> RATE[GET /exchange-rates
+    ?base=FROM
+    &quote=TO]
+
+    RATE --> EA1[Live exchange rate:
+    rate
+    asOf]
+
+    EA -.->|fetching rate| EAL[Loading:
+    Loading exchange rate...]
+
+    EA -.->|rate fetch fails| EA2[Error:
+    Unable to load exchange rate
+    Try again]
+
+    EA2 -.-> EA
+
+    EA --> EQ[POST /exchange-quotes]
+
+    EQ --> ER[Review and confirm screen:
+    From currency
+    To currency
+    Amount
+    Fee
+    Rate
+    Destination amount
+    Quote expiry]
+
+    EQ -.->|insufficient funds| ER1[Error:
+    Insufficient balance]
+
+    ER1 --> EA
+
+    ER --> EH{Tap Confirm Exchange}
+
+    EH --> EX[POST /exchanges
+    Idempotency-Key]
+
+    EX -->|quote expired| EI[Error:
+    Quote expired - refresh]
+
+    EI --> ET
+
+    EX -->|quote already consumed| EIC[Error:
+    Quote already consumed]
+
+    EIC --> ET
+
+    EX -->|insufficient balance| ER1
+
+    EX -->|processing| EH1[Loading:
+    Processing exchange...]
+
+    EH1 -->|success| ESuc[Success screen:
+    Exchange completed successfully]
+
+    EH1 -->|failed| EF[Error:
+    Exchange failed]
+
+    EF --> ER
+
+    ESuc --> TabHome
