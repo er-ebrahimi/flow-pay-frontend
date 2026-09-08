@@ -11,8 +11,15 @@
 import axios from "axios";
 import { getSession } from "next-auth/react";
 
+// Server-side calls resolve against the Docker network hostname; client-side
+// calls go to localhost (the browser runs on the host, not in the container).
+const baseURL =
+  typeof window === "undefined"
+    ? process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL || "/api"
+    : process.env.NEXT_PUBLIC_API_URL || "/api"
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
+  baseURL,
   timeout: 10000,
   // No withCredentials: auth is Bearer-only (docs/API_CONTRACT.md — the
   // session cookie belongs to the same-origin NextAuth route handler, never

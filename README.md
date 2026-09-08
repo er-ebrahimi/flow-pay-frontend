@@ -44,6 +44,27 @@ npm run dev -- -p 3001
 
 Open [http://localhost:3001](http://localhost:3001). Register an account, sign in, and the dashboard shows your real wallet balances.
 
+## Docker
+
+```bash
+# 1. Create .env from the example
+cp .env.example .env
+
+# 2. Create the external network (first time only)
+docker network create flow-pay-network
+
+# 3. Build and run
+docker compose up --build
+```
+
+The frontend is available at [http://localhost:3001](http://localhost:3001).
+
+**How `.env` works with Docker:**
+- Docker Compose reads `.env` automatically for variable substitution in `docker-compose.yml`
+- `NEXT_PUBLIC_API_URL` is baked into the client bundle at build time — must be `http://localhost:3000` (the browser runs on the host)
+- `API_INTERNAL_URL` is used by server-side code (SSR/API routes) — set to `http://api:3000` (Docker network)
+- `.env` is gitignored — commit `.env.example` to share the structure
+
 ## Environment
 
 | Variable | Required | Default | Description |

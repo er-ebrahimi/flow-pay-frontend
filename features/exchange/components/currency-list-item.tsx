@@ -26,7 +26,7 @@ export function CurrencyListItem({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex w-full items-center gap-3 rounded-xl border bg-card p-3.5 text-left transition-colors hover:bg-muted/40",
+        "flex w-full items-center gap-3 rounded-xl border bg-card p-3.5 text-left transition-colors hover:bg-muted/40 hover:cursor-pointer",
         className,
       )}
     >
@@ -39,7 +39,9 @@ export function CurrencyListItem({
           {name}
         </span>
       </span>
-      {trailing ? <span className="flex-none text-right">{trailing}</span> : null}
+      {trailing ? (
+        <span className="flex-none text-right">{trailing}</span>
+      ) : null}
       <ChevronRightIcon
         aria-hidden="true"
         className="size-4 flex-none text-muted-foreground/50"

@@ -82,7 +82,7 @@ export function AmountForm({
               setInput(normalizeAmountInput(event.target.value))
             }
             aria-invalid={overPrecision || insufficient || undefined}
-            className="h-auto border-0 bg-transparent font-mono text-3xl font-semibold tracking-tight dark:bg-transparent px-2"
+            className="h-auto border bg-transparent font-mono text-3xl font-semibold tracking-tight dark:bg-transparent px-2 "
           />
         </div>
         {balance !== undefined ? (

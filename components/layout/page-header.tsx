@@ -42,6 +42,7 @@ export function PageHeader({
           size="icon"
           aria-label="Go back"
           onClick={onBack ?? (() => router.back())}
+          className={"hover:cursor-pointer"}
         >
           <ArrowLeftIcon aria-hidden="true" />
         </Button>
