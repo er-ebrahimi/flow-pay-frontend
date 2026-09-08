@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/axios";
 import { endpoints } from "@/lib/api/endpoints";
 import type { ExchangeQuote } from "../types";
-import { fetchExchangeRate } from "./use-exchange-rate";
 
 // Contract: POST /exchange-quotes { fromCurrency, toCurrency, amount } →
 // ExchangeQuote (201). Rejects with the contract's error shapes:
@@ -47,7 +46,3 @@ export function useExchangeQuote(args: {
     retry: false,
   });
 }
-
-// Kept: the rate query is shared with the target-currency list, which still
-// needs the indicative rate per pair.
-export { fetchExchangeRate };

@@ -8,7 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { logger } from "@/lib/logger";
 import {
   TransactionRow,
-  useTransactions,
   type Transaction,
 } from "@/features/transactions";
 import { useWallets, WalletCard } from "@/features/wallets";
@@ -48,9 +47,6 @@ function DashboardSkeleton() {
 export function Dashboard() {
   const { data, isLoading, isError, error } = useDashboard();
   const { data: wallets } = useWallets();
-  // Recent transactions come from the same aggregate response in the contract;
-  // the standalone list query stays in sync via invalidation after exchanges.
-  const recent = useTransactions({ limit: 5 });
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -61,7 +57,7 @@ export function Dashboard() {
     return <ErrorState error={error} title="Could not load your dashboard" />;
   }
 
-  const transactions = recent.data?.items ?? data.recentTransactions;
+  const transactions = data.recentTransactions;
 
   return (
     <div className="space-y-6">

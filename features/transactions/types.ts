@@ -31,7 +31,6 @@ export interface TransactionList {
 /** Query params for GET /transactions (subset the UI actually sends). */
 export interface TransactionFilters {
   page?: number;
-  limit?: number;
   type?: TransactionType;
   status?: TransactionStatus;
   currency?: string;

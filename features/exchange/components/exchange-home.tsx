@@ -39,10 +39,13 @@ export function ExchangeHome() {
   }
 
   const query = search.trim().toLowerCase();
+  // Only currencies the user holds a wallet for can be exchanged from.
+  const heldCodes = new Set(wallets.data?.map((w) => w.currencyCode));
   const filtered = currencies.data.filter(
     (currency) =>
-      currency.code.toLowerCase().includes(query) ||
-      currency.name.toLowerCase().includes(query),
+      heldCodes.has(currency.code) &&
+      (currency.code.toLowerCase().includes(query) ||
+        currency.name.toLowerCase().includes(query)),
   );
 
   return (
@@ -85,16 +88,14 @@ export function ExchangeHome() {
                 name={currency.name}
                 onClick={() => router.push(`/exchange/from/${currency.code}`)}
                 trailing={
-                  wallet ? (
-                    <span>
-                      <span className="block font-mono text-sm font-semibold">
-                        {formatMoney(wallet.balance, wallet.currencyCode)}
-                      </span>
-                      <span className="block text-xs text-muted-foreground">
-                        available
-                      </span>
+                  <span>
+                    <span className="block font-mono text-sm font-semibold">
+                      {formatMoney(wallet!.balance, currency.code)}
                     </span>
-                  ) : undefined
+                    <span className="block text-xs text-muted-foreground">
+                      available
+                    </span>
+                  </span>
                 }
               />
             );
