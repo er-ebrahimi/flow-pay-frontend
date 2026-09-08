@@ -3,12 +3,17 @@ import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Dashboard } from "../dashboard";
+import { useDashboard } from "../../api/use-dashboard";
 import { useWallets } from "@/features/wallets";
 import type { Wallet } from "@/features/wallets";
 
 vi.mock("next-auth/react", () => ({
   useSession: () => ({ data: { user: { email: "alex@example.com" } } }),
   signOut: vi.fn(),
+}));
+
+vi.mock("../../api/use-dashboard", () => ({
+  useDashboard: vi.fn(),
 }));
 
 // The dashboard reads real wallet balances — stub the hook, keep the real
@@ -46,6 +51,17 @@ function createWrapper() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(useDashboard).mockReturnValue({
+    data: {
+      totalBalanceBase: "18542.72",
+      baseCurrency: "USD",
+      wallets: WALLETS,
+      recentTransactions: [],
+    },
+    isPending: false,
+    isError: false,
+    error: null,
+  } as unknown as ReturnType<typeof useDashboard>);
   vi.mocked(useWallets).mockReturnValue({
     data: WALLETS,
     isPending: false,
@@ -55,8 +71,14 @@ beforeEach(() => {
 });
 
 describe("Dashboard (integration)", () => {
-  it("renders real wallet balances with an honest total and empty recent", async () => {
+  it("renders the real total balance, wallets, and an empty recent state", async () => {
     render(<Dashboard />, { wrapper: createWrapper() });
+
+    // Real total from the aggregate.
+    expect(
+      await screen.findByText("$18,542.72", {}, { timeout: 2500 }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Base currency · USD")).toBeInTheDocument();
 
     // Real wallet rail.
     expect(await screen.findByText("$4,250.00")).toBeInTheDocument();
@@ -64,12 +86,7 @@ describe("Dashboard (integration)", () => {
     expect(screen.getByText("My wallets")).toBeInTheDocument();
     expect(screen.getByText("5 currencies")).toBeInTheDocument();
 
-    // Total stays a placeholder — conversion rates don't exist yet.
-    expect(
-      screen.getByText(/Available once the rate service is live/),
-    ).toBeInTheDocument();
-
-    // Recent is honestly empty until GET /transactions ships.
+    // Recent is empty until the user makes exchanges.
     expect(screen.getByText("No transactions yet")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /view all/i })).toHaveAttribute(
       "href",

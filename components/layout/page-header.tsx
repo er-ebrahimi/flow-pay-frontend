@@ -9,8 +9,14 @@ interface PageHeaderProps {
   /** Main screens: title left-aligned, optional description. */
   title: string;
   description?: string;
-  /** Sub-screens: centered small-caps label with a back arrow (router.back()). */
+  /** Sub-screens: centered small-caps label with a back arrow. */
   back?: boolean;
+  /**
+   * Where the back arrow goes. Defaults to router.back() (browser history),
+   * which is wrong for multi-step flows — pass the previous step's path
+   * instead (e.g. the exchange flow's source → target → amount → review).
+   */
+  onBack?: () => void;
   className?: string;
 }
 
@@ -18,6 +24,7 @@ export function PageHeader({
   title,
   description,
   back = false,
+  onBack,
   className,
 }: PageHeaderProps) {
   const router = useRouter();
@@ -34,7 +41,7 @@ export function PageHeader({
           variant="ghost"
           size="icon"
           aria-label="Go back"
-          onClick={() => router.back()}
+          onClick={onBack ?? (() => router.back())}
         >
           <ArrowLeftIcon aria-hidden="true" />
         </Button>

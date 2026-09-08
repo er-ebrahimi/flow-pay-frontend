@@ -51,8 +51,11 @@ export function AmountForm({
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!canContinue) return;
+    // The backend rejects wrong precision (INVALID_AMOUNT) — send the
+    // currency-precisioned string (JPY "44850", not "44850.00").
+    const precisionAmount = formatAmount(amount as number, decimalPlaces);
     router.push(
-      `/exchange/from/${fromCurrency}/to/${toCurrency}/review?amount=${encodeURIComponent(normalized)}`,
+      `/exchange/from/${fromCurrency}/to/${toCurrency}/review?amount=${encodeURIComponent(precisionAmount)}`,
     );
   }
 
@@ -75,9 +78,11 @@ export function AmountForm({
             autoComplete="off"
             placeholder="0.00"
             value={input}
-            onChange={(event) => setInput(normalizeAmountInput(event.target.value))}
+            onChange={(event) =>
+              setInput(normalizeAmountInput(event.target.value))
+            }
             aria-invalid={overPrecision || insufficient || undefined}
-            className="h-auto border-0 bg-transparent px-0 font-mono text-3xl font-semibold tracking-tight dark:bg-transparent"
+            className="h-auto border-0 bg-transparent font-mono text-3xl font-semibold tracking-tight dark:bg-transparent px-2"
           />
         </div>
         {balance !== undefined ? (
@@ -115,7 +120,9 @@ export function AmountForm({
         <Skeleton className="h-20 w-full rounded-xl" />
       ) : rate.isError ? (
         <div className="flex items-center justify-between rounded-xl border border-destructive/30 bg-destructive/10 p-4">
-          <p className="text-sm text-destructive">Unable to load exchange rate</p>
+          <p className="text-sm text-destructive">
+            Unable to load exchange rate
+          </p>
           <Button
             type="button"
             variant="ghost"
@@ -144,7 +151,12 @@ export function AmountForm({
         </section>
       ) : null}
 
-      <Button type="submit" size="lg" disabled={!canContinue} className="w-full">
+      <Button
+        type="submit"
+        size="lg"
+        disabled={!canContinue}
+        className="w-full"
+      >
         Get quote
       </Button>
     </form>

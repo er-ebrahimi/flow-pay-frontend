@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/axios";
+import { endpoints } from "@/lib/api/endpoints";
 import type { Currency } from "../types";
 
 // Contract: GET /currencies → Currency[] sorted by code, always 200 (empty
@@ -9,7 +10,7 @@ import type { Currency } from "../types";
 // that currency (unknown codes silently filter nothing).
 
 export async function fetchCurrencies(exclude?: string): Promise<Currency[]> {
-  const response = await api.get<Currency[]>("/currencies", {
+  const response = await api.get<Currency[]>(endpoints.currencies, {
     params: exclude ? { exclude } : undefined,
   });
   return response.data;

@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/lib/axios";
+import { endpoints } from "@/lib/api/endpoints";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 
 // Contract: POST /auth/register { email, password } → 201
@@ -18,7 +19,10 @@ export async function registerAccount(input: {
   email: string;
   password: string;
 }): Promise<RegisterResponse> {
-  const response = await api.post<RegisterResponse>("/auth/register", input);
+  const response = await api.post<RegisterResponse>(
+    endpoints.auth.register,
+    input,
+  );
   return response.data;
 }
 

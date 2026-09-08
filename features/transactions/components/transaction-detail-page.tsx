@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/layout/page-header";
@@ -13,12 +14,17 @@ interface TransactionDetailPageProps {
 }
 
 export function TransactionDetailPage({ id }: TransactionDetailPageProps) {
+  const router = useRouter();
   const { data: tx, isPending, isError, error } = useTransaction(id);
 
   if (isPending) {
     return (
       <div>
-        <PageHeader back title="Transaction" />
+        <PageHeader
+          back
+          title="Transaction"
+          onBack={() => router.push("/")}
+        />
         <div className="flex flex-col items-center">
           <Skeleton className="size-16 rounded-2xl" />
           <Skeleton className="mt-4 h-9 w-40" />
@@ -32,7 +38,11 @@ export function TransactionDetailPage({ id }: TransactionDetailPageProps) {
     logger.error({ err: error }, "Failed to load transaction");
     return (
       <div>
-        <PageHeader back title="Transaction" />
+        <PageHeader
+          back
+          title="Transaction"
+          onBack={() => router.push("/")}
+        />
         <ErrorState error={error} title="Could not load this transaction" />
       </div>
     );
@@ -69,7 +79,11 @@ export function TransactionDetailPage({ id }: TransactionDetailPageProps) {
 
   return (
     <div>
-      <PageHeader back title="Transaction" />
+      <PageHeader
+        back
+        title="Transaction"
+        onBack={() => router.push("/")}
+      />
 
       <div className="mb-8 flex flex-col items-center text-center">
         <TransactionStatusBadge status={tx.status} />

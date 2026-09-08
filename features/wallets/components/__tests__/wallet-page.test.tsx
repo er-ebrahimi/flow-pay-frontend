@@ -6,6 +6,8 @@ import { WalletPage } from "../wallet-page";
 import { useWallet } from "../../api/use-wallet";
 import { apiError } from "@/lib/api-error";
 import type { WalletDetail } from "../../types";
+import { TRANSACTION_FIXTURES } from "@/features/transactions/api/fixtures";
+import { useTransactions } from "@/features/transactions";
 
 const { backMock } = vi.hoisted(() => ({ backMock: vi.fn() }));
 
@@ -19,12 +21,17 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Boundary mock: GET /wallets/:code is now a real axios call — the page test
-// stubs the hook instead (TEST.md §5). The transactions side still runs the
-// feature's mock transport (endpoint not shipped), which is what makes the
-// list/empty assertions possible without a backend.
+// stubs the hook instead (TEST.md §5). GET /transactions is also real now, so
+// stub that too; the transactions side keeps the feature's mock transport
+// otherwise.
 vi.mock("../../api/use-wallet", () => ({
   useWallet: vi.fn(),
 }));
+
+vi.mock("@/features/transactions", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/features/transactions")>();
+  return { ...actual, useTransactions: vi.fn() };
+});
 
 vi.mock("next/link", () => ({
   default: (props: { href: string; children?: React.ReactNode }) =>
@@ -74,6 +81,21 @@ function createWrapper() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Mirror the real API: filter by currency (source or destination side).
+  vi.mocked(useTransactions).mockImplementation((filters) => {
+    const items = TRANSACTION_FIXTURES.filter(
+      (tx) =>
+        !filters?.currency ||
+        tx.fromCurrency === filters.currency ||
+        tx.toCurrency === filters.currency,
+    );
+    return {
+      data: { items, page: 1, limit: 20, total: items.length },
+      isPending: false,
+      isError: false,
+      error: null,
+    } as never;
+  });
 });
 
 describe("WalletPage (integration)", () => {

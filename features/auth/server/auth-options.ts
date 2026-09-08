@@ -3,6 +3,7 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import "./get-server-auth-headers"; // registers the server-side auth provider
 import { api } from "@/lib/axios";
+import { endpoints } from "@/lib/api/endpoints";
 import { getAuthSecret } from "./auth-secret";
 import { logger } from "@/lib/logger";
 
@@ -29,10 +30,13 @@ export const authOptions: NextAuthOptions = {
           // docs/API_CONTRACT.md. The contract has no refresh token and no
           // profile endpoint, so the access token is all we persist; on
           // expiry the axios interceptor redirects to /login (401).
-          const response = await api.post<LoginResponse>("/auth/login", {
-            email: credentials.email,
-            password: credentials.password,
-          });
+          const response = await api.post<LoginResponse>(
+            endpoints.auth.login,
+            {
+              email: credentials.email,
+              password: credentials.password,
+            },
+          );
 
           if (response.data?.accessToken) {
             return {

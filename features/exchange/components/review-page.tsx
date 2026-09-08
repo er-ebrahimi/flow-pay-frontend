@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { getErrorCode, getErrorMessage } from "@/lib/logger";
-import { useWallets } from "@/features/wallets";
 import {
   exchangeQuoteKey,
   useExchangeQuote,
@@ -40,14 +39,10 @@ export function ReviewPage({ fromCode, toCode, amount }: ReviewPageProps) {
   const queryClient = useQueryClient();
   const [quoteExpired, setQuoteExpired] = useState(false);
 
-  const wallets = useWallets();
-  const balance = wallets.data?.find((w) => w.currencyCode === fromCode)
-    ?.balance;
   const quote = useExchangeQuote({
     fromCurrency: fromCode,
     toCurrency: toCode,
     amount,
-    balance,
   });
   const confirm = useConfirmExchange();
 
@@ -105,7 +100,7 @@ export function ReviewPage({ fromCode, toCode, amount }: ReviewPageProps) {
           if (staleQuote) {
             setQuoteExpired(false);
             queryClient.invalidateQueries({
-              queryKey: exchangeQuoteKey(fromCode, toCode, amount, balance),
+              queryKey: exchangeQuoteKey(fromCode, toCode, amount),
             });
           }
         }}
@@ -115,7 +110,11 @@ export function ReviewPage({ fromCode, toCode, amount }: ReviewPageProps) {
 
   return (
     <div>
-      <PageHeader back title="Review" />
+      <PageHeader
+        back
+        title="Review"
+        onBack={() => router.push(`/exchange/from/${fromCode}/to/${toCode}`)}
+      />
       <h2 className="text-xl font-semibold tracking-tight">
         Review and confirm
       </h2>
@@ -138,7 +137,7 @@ export function ReviewPage({ fromCode, toCode, amount }: ReviewPageProps) {
             onClick={() => {
               setQuoteExpired(false);
               queryClient.invalidateQueries({
-                queryKey: exchangeQuoteKey(fromCode, toCode, amount, balance),
+              queryKey: exchangeQuoteKey(fromCode, toCode, amount),
               });
             }}
           >

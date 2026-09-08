@@ -5,7 +5,7 @@ export type {
   TransactionStatus,
   TransactionType,
 } from "./types";
-export { useTransactions, MOCK_TRANSACTIONS } from "./api/use-transactions";
+export { useTransactions } from "./api/use-transactions";
 export { useTransaction } from "./api/use-transaction";
 export { TransactionRow } from "./components/transaction-row";
 export { TransactionStatusBadge } from "./components/transaction-status-badge";

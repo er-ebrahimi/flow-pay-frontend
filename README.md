@@ -76,17 +76,12 @@ The transport speaks the contract in [`docs/API_CONTRACT.md`](docs/API_CONTRACT.
 | `POST /auth/register` | Register form |
 | `POST /auth/login` | NextAuth credentials provider |
 | `POST /auth/logout` | Dashboard header sign-out |
+| `GET /dashboard` | Total balance + recent transactions |
 | `GET /currencies` (+`?exclude=`) | Exchange source/target lists |
 | `GET /wallets`, `GET /wallets/:code` | Dashboard rail, currency history |
-
-**Mocked (endpoints not shipped yet — each mock module carries the exact one-line axios swap):**
-
-| Endpoint | UI it feeds |
-|---|---|
-| `GET /dashboard` | (dashboard uses real `/wallets` + honest placeholders instead) |
 | `GET /transactions`, `GET /transactions/:id` | History + detail pages |
 | `GET /exchange-rates` | Live rate display, amount preview |
-| `POST /exchange-quotes`, `POST /exchanges` | Review + confirm flow (Idempotency-Key header already wired) |
+| `POST /exchange-quotes`, `POST /exchanges` | Review + confirm flow (Idempotency-Key header wired) |
 
 ## Project Structure
 

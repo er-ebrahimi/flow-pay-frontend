@@ -17,6 +17,8 @@ export interface Transaction {
   destinationAmount: string;
   status: TransactionStatus;
   createdAt: string;
+  /** Quote that froze the exchange (uuid). Present on the detail response. */
+  quoteId?: string;
 }
 
 export interface TransactionList {

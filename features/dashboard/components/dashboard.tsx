@@ -6,14 +6,19 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { logger } from "@/lib/logger";
+import {
+  TransactionRow,
+  useTransactions,
+  type Transaction,
+} from "@/features/transactions";
 import { useWallets, WalletCard } from "@/features/wallets";
+import { useDashboard } from "../api/use-dashboard";
 import { BalanceCard } from "./balance-card";
 import { DashboardHeader } from "./dashboard-header";
 
-// Real data where the backend has it (GET /wallets), honest gaps where it
-// doesn't: the total stays a placeholder until the rate service exists, and
-// the recent list is empty until GET /transactions ships (both verified 404
-// on 2026-09-08).
+// The aggregate GET /dashboard supplies the total balance and recent
+// transactions; the wallet rail reads real GET /wallets (refreshed by the
+// exchange invalidation). Both refresh on confirm.
 
 function DashboardSkeleton() {
   return (
@@ -41,16 +46,22 @@ function DashboardSkeleton() {
 }
 
 export function Dashboard() {
-  const { data: wallets, isLoading, isError, error } = useWallets();
+  const { data, isLoading, isError, error } = useDashboard();
+  const { data: wallets } = useWallets();
+  // Recent transactions come from the same aggregate response in the contract;
+  // the standalone list query stays in sync via invalidation after exchanges.
+  const recent = useTransactions({ limit: 5 });
 
   if (isLoading) {
     return <DashboardSkeleton />;
   }
 
-  if (isError || !wallets) {
-    logger.error({ err: error }, "Failed to load wallets");
-    return <ErrorState error={error} title="Could not load your wallets" />;
+  if (isError || !data) {
+    logger.error({ err: error }, "Failed to load dashboard");
+    return <ErrorState error={error} title="Could not load your dashboard" />;
   }
+
+  const transactions = recent.data?.items ?? data.recentTransactions;
 
   return (
     <div className="space-y-6">
@@ -58,7 +69,10 @@ export function Dashboard() {
 
       <div className="lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-6">
         <div className="space-y-6">
-          <BalanceCard />
+          <BalanceCard
+            totalBalanceBase={data.totalBalanceBase}
+            baseCurrency={data.baseCurrency}
+          />
 
           <section aria-labelledby="wallets-heading">
             <div className="mb-3 flex items-center justify-between">
@@ -69,22 +83,16 @@ export function Dashboard() {
                 My wallets
               </h2>
               <span className="text-xs text-muted-foreground">
-                {wallets.length} currencies
+                {(wallets ?? []).length} currencies
               </span>
             </div>
-            {wallets.length === 0 ? (
-              <EmptyState
-                icon={HistoryIcon}
-                title="No wallets yet"
-                description="Sign in to see your currency wallets."
-              />
-            ) : (
+            {wallets && wallets.length > 0 ? (
               <div className="flex gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-2 md:overflow-visible xl:grid-cols-3">
                 {wallets.map((wallet) => (
                   <WalletCard key={wallet.currencyCode} wallet={wallet} />
                 ))}
               </div>
-            )}
+            ) : null}
           </section>
         </div>
 
@@ -103,11 +111,19 @@ export function Dashboard() {
               View all
             </Link>
           </div>
-          <EmptyState
-            icon={HistoryIcon}
-            title="No transactions yet"
-            description="Your exchanges will appear here once transaction history is live."
-          />
+          {transactions.length === 0 ? (
+            <EmptyState
+              icon={HistoryIcon}
+              title="No transactions yet"
+              description="Start exchanging to see your history."
+            />
+          ) : (
+            <div className="flex flex-col gap-2">
+              {transactions.map((tx: Transaction) => (
+                <TransactionRow key={tx.id} transaction={tx} />
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </div>

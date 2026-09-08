@@ -26,7 +26,7 @@ export function SelectTargetPage({ fromCode }: SelectTargetPageProps) {
   if (currencies.isPending || targets.isPending) {
     return (
       <div>
-        <PageHeader back title="Exchange" />
+        <PageHeader back title="Exchange" onBack={() => router.push("/exchange")} />
         <CurrencyListSkeleton />
       </div>
     );
@@ -52,7 +52,7 @@ export function SelectTargetPage({ fromCode }: SelectTargetPageProps) {
 
   return (
     <div>
-      <PageHeader back title="Exchange" />
+      <PageHeader back title="Exchange" onBack={() => router.push("/exchange")} />
 
       <div className="mb-6 flex items-center gap-3 rounded-xl border bg-card p-3">
         <span className="flex size-9 flex-none items-center justify-center rounded-full bg-muted text-xs font-bold">

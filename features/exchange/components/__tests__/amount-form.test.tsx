@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AmountForm } from "../amount-form";
+import { useExchangeRate } from "../../api/use-exchange-rate";
+import type { ExchangeRate } from "../../types";
 
 const { pushMock } = vi.hoisted(() => ({ pushMock: vi.fn() }));
 
@@ -15,6 +17,18 @@ vi.mock("next/navigation", () => ({
     refresh: vi.fn(),
   }),
 }));
+
+// GET /exchange-rates is a real axios call now — stub the hook (TEST.md §5).
+vi.mock("../../api/use-exchange-rate", () => ({
+  useExchangeRate: vi.fn(),
+}));
+
+const RATE: ExchangeRate = {
+  base: "USD",
+  quote: "EUR",
+  rate: "0.9230",
+  asOf: "2026-09-08T12:00:00Z",
+};
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -29,6 +43,13 @@ function createWrapper() {
 
 beforeEach(() => {
   pushMock.mockClear();
+  vi.mocked(useExchangeRate).mockReturnValue({
+    data: RATE,
+    isPending: false,
+    isError: false,
+    error: null,
+    refetch: vi.fn(),
+  } as never);
 });
 
 describe("AmountForm", () => {
@@ -127,7 +148,7 @@ describe("AmountForm", () => {
 
     await waitFor(() => {
       expect(pushMock).toHaveBeenCalledWith(
-        "/exchange/from/USD/to/EUR/review?amount=50",
+        "/exchange/from/USD/to/EUR/review?amount=50.00",
       );
     });
   });

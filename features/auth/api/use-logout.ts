@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/lib/axios";
+import { endpoints } from "@/lib/api/endpoints";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 
 // Contract: POST /auth/logout → 204, no body (Bearer-auth). The JWT itself
@@ -8,7 +9,7 @@ import { useApiMutation } from "@/hooks/use-api-mutation";
 // client session regardless, so this call is hygiene, not security.
 
 export async function logoutApi(): Promise<void> {
-  await api.post("/auth/logout");
+  await api.post(endpoints.auth.logout);
 }
 
 export function useLogout() {

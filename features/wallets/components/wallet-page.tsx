@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { HistoryIcon } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
@@ -20,13 +21,18 @@ interface WalletPageProps {
 
 /** Currency history — wallet summary + that currency's transactions. */
 export function WalletPage({ currencyCode }: WalletPageProps) {
+  const router = useRouter();
   const wallet = useWallet(currencyCode);
   const transactions = useTransactions({ currency: currencyCode });
 
   if (wallet.isPending) {
     return (
       <div>
-        <PageHeader back title={currencyCode} />
+        <PageHeader
+          back
+          title={currencyCode}
+          onBack={() => router.push("/")}
+        />
         <div className="lg:grid lg:grid-cols-[340px_1fr] lg:items-start lg:gap-6">
           <Skeleton className="mb-6 h-44 w-full rounded-xl lg:mb-0" />
           <div className="space-y-2">
@@ -50,7 +56,11 @@ export function WalletPage({ currencyCode }: WalletPageProps) {
 
   return (
     <div>
-      <PageHeader back title={wallet.data.currencyCode} />
+      <PageHeader
+        back
+        title={wallet.data.currencyCode}
+        onBack={() => router.push("/")}
+      />
 
       <div className="lg:grid lg:grid-cols-[340px_1fr] lg:items-start lg:gap-6">
         <WalletSummaryCard wallet={wallet.data} />

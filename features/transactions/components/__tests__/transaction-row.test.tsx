@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
-import { MOCK_TRANSACTIONS } from "../../api/use-transactions";
+import { TRANSACTION_FIXTURES } from "../../api/fixtures";
 import { TransactionRow } from "../transaction-row";
 
 // The row is a next/link; render it as a plain anchor so the unit test
@@ -19,7 +19,7 @@ vi.mock("next/link", () => ({
 }));
 
 describe("TransactionRow", () => {
-  const tx = MOCK_TRANSACTIONS[0];
+  const tx = TRANSACTION_FIXTURES[0];
 
   it("links to the transaction detail route", () => {
     render(<TransactionRow transaction={tx} />);

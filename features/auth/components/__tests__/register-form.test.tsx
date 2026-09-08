@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { RegisterForm } from "../register-form";
 import { api } from "@/lib/axios";
+import { endpoints } from "@/lib/api/endpoints";
 import { apiError } from "@/lib/api-error";
 import { showApiErrorToast, showApiSuccessToast } from "@/lib/toast";
 
@@ -89,7 +90,7 @@ describe("RegisterForm", () => {
       await screen.findByText("This email is already registered."),
     ).toBeInTheDocument();
     expect(pushMock).not.toHaveBeenCalled();
-    expect(api.post).toHaveBeenCalledWith("/auth/register", {
+    expect(api.post).toHaveBeenCalledWith(endpoints.auth.register, {
       email: "taken@example.com",
       password: "password123",
     });

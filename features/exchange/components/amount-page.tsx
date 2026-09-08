@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { ErrorState } from "@/components/ui/error-state";
 import { Loading } from "@/components/ui/loading";
 import { PageHeader } from "@/components/layout/page-header";
@@ -15,6 +16,7 @@ interface AmountPageProps {
 
 /** Step 3 — amount entry with live rate, precision clamp, balance pre-check. */
 export function AmountPage({ fromCode, toCode }: AmountPageProps) {
+  const router = useRouter();
   const currencies = useCurrencies();
   const wallets = useWallets();
 
@@ -45,7 +47,11 @@ export function AmountPage({ fromCode, toCode }: AmountPageProps) {
 
   return (
     <div>
-      <PageHeader back title="Enter amount" />
+      <PageHeader
+        back
+        title="Enter amount"
+        onBack={() => router.push(`/exchange/from/${fromCode}`)}
+      />
       <AmountForm
         fromCurrency={fromCode}
         toCurrency={toCode}

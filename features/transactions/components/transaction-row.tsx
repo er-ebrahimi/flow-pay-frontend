@@ -19,7 +19,7 @@ export function TransactionRow({ transaction: tx }: TransactionRowProps) {
   return (
     <Link
       href={`/transactions/${tx.id}`}
-      className="flex items-center gap-3 rounded-xl border bg-card p-3 transition-colors hover:bg-muted/40 md:grid md:grid-cols-[7.5rem_6rem_1fr_10rem_6.5rem_7rem] md:items-center md:gap-4 md:px-4"
+      className="flex items-center gap-3 rounded-xl border bg-card p-3 transition-colors hover:bg-muted/40  flex-wrap"
     >
       {/* Type icon — mobile only; the md+ row shows the type as text. */}
       <div className="flex size-9 flex-none items-center justify-center rounded-lg bg-primary/10 text-foreground md:hidden">
@@ -34,7 +34,9 @@ export function TransactionRow({ transaction: tx }: TransactionRowProps) {
           </p>
           <TransactionStatusBadge status={tx.status} />
         </div>
-        <p className="text-xs text-muted-foreground">{formatDate(tx.createdAt)}</p>
+        <p className="text-xs text-muted-foreground">
+          {formatDate(tx.createdAt)}
+        </p>
       </div>
       <div className="flex-none text-right md:hidden">
         <p className="font-mono text-sm font-semibold">
