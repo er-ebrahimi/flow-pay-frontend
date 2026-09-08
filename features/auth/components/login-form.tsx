@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +12,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { getErrorMessage } from "@/lib/logger";
 import { showApiErrorToast } from "@/lib/toast";
 
@@ -80,11 +82,11 @@ export function LoginForm({ callbackUrl: callbackUrlProp }: LoginFormProps) {
       </Field>
       <Field>
         <FieldLabel htmlFor="password">Password</FieldLabel>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           autoComplete="current-password"
           required
+          maxLength={72}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           aria-invalid={Boolean(error)}
@@ -93,6 +95,16 @@ export function LoginForm({ callbackUrl: callbackUrlProp }: LoginFormProps) {
       <Button type="submit" loading={isBusy}>
         Sign in
       </Button>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/register"
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
+          Register
+        </Link>
+      </p>
     </form>
   );
 }

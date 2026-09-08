@@ -14,7 +14,10 @@ import { getSession } from "next-auth/react";
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
   timeout: 10000,
-  withCredentials: true,
+  // No withCredentials: auth is Bearer-only (docs/API_CONTRACT.md — the
+  // session cookie belongs to the same-origin NextAuth route handler, never
+  // to the backend). Non-credentialed CORS keeps the backend's allowlist
+  // simple; adding cookies later means exact-origin + allow-credentials.
 });
 
 type ServerAuthProvider = () => Promise<{ Authorization: string } | null>
